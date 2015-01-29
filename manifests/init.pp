@@ -1,30 +1,59 @@
+# == Class: nav
+#
+# Sets up NAV with Graphite
+#
+# === Parameters
+#
+# TODO
+#
+# === Variables
+#
+# TODO
+#
+# === Examples
+#
+#  class { 'nav': }
+#
+# === Authors
+#
+# Anders Vaage <anders@unix.uib.no>
+# Raymond Kristiansen <raymond@it.uib.no>
+#
+# === Copyright
+#
+# Copyright 2015 University of Bergen
+#
 class nav(
-  $packages = 'nav-omnibus',
-  $install_dir = '/usr/local/nav',
-  $nav_user_name = 'navcron',
-  $nav_user_uid = '512',
-  $nav_user_group = 'nav',
-  $nav_user_gid = '512',
-  $nav_create_db = true,
-  $graphite_dir = '/opt/graphite',
-  $graphite_user_name = 'graphite',
-  $graphite_user_uid = '513',
+  $packages            = 'nav-omnibus',
+  $install_dir         = '/usr/local/nav',
+  $python_path         = '/usr/lib64/python2.7',
+  $use_scl             = false,
+  $nav_user_name       = 'nav',
+  $nav_user_uid        = undef,
+  $navcron_user_name   = 'navcron',
+  $navcron_user_uid    = undef,
+  $nav_user_group      = 'nav',
+  $nav_user_gid        = undef,
+  $nav_create_db       = true,
+  $graphite_dir        = '/opt/graphite',
+  $graphite_user_name  = 'graphite',
+  $graphite_user_uid   = undef,
   $graphite_user_group = 'graphite',
-  $graphite_user_gid = '513',
-  $graphite_create_db = true,
-  $db_password = undef,
-  $debug = false,
-  $web_service = 'httpd',
-  $cronjobs = {
-    activeip => { ensure => true, minute => '*/30', command => 'collect_active_ip.py'},
-    logengine_regular => { ensure => true, command => 'logengine.py -q' },
-    logengine_del => { ensure => true, minute => 3, hour => 3, command => 'logengine.py -d' },
-    mactrace => { ensure => true, minute => [11,26,41,56], command => 'macwatch.py'},
-    maintengine => { ensure => true, minute => '*/5', command => 'maintengine.py' },
-    netbiostracker => { ensure => true, minute => '*/15', command => 'netbiostracker.py' }, 
-    psuwatch => { ensure => true, minute => 5, command => 'powersupplywatch.py'},
-    thresholdmon => { ensure => true, minute => '*/5' },
-    topology => { ensure => true, minute => 35, command => 'navtopology --l2 --vlan' }
+  $graphite_user_gid   = undef,
+  $graphite_create_db  = true,
+  $db_password         = undef,
+  $debug               = false,
+  $web_service         = 'httpd',
+  $cronjobs            = {
+    activeip          => {},
+    logengine_regular => {},
+    logengine_del     => {},
+    mactrace          => {},
+    maintengine       => {},
+    netbiostracker    => {},
+    psuwatch          => {},
+    thresholdmon      => {},
+    topology          => {}
   }
 ) {
 

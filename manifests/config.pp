@@ -1,7 +1,11 @@
 class nav::config(
   $install_dir          = $nav::install_dir,
+  $python_path          = $nav::python_path,
+  $use_scl              = $nav::use_scl,
   $nav_user_name        = $nav::nav_user_name,
   $nav_user_uid         = $nav::nav_user_uid,
+  $navcron_user_name    = $nav::navcron_user_name,
+  $navcron_user_uid     = $nav::navcron_user_uid,
   $nav_user_group       = $nav::nav_user_group,
   $nav_user_gid         = $nav::nav_user_gid,
   $nav_create_db        = $nav::nav_create_db,
@@ -55,7 +59,7 @@ class nav::config(
     recurse => false,
     owner => 'graphite',
     group => 'graphite',
-    require => User[$graphite_user_name] 
+    require => User[$graphite_user_name]
   }
 
   file { $install_dir:
@@ -65,13 +69,13 @@ class nav::config(
     require => User[$nav_user_name]
   }
 
-  # nav/var must be writable
-  file { "${install_dir}/var":
-    ensure => directory,
-    recurse => false,
-    owner => $nav_user_name,
-    group => $nav_user_group,
-    require => User[$nav_user_name]
+  exec { 'chgrp_installdir_var':
+    command  => "chgrp -R ${nav_user_group} ${install_dir}/var && chmod -R 0775 ${install_dir}/var",
+    path     => '/bin',
+    provider => 'shell',
+    before   => Class[nav::service],
+    unless   => "test $(stat -c %G ${install_dir}/var) = ${nav_user_group}",
+    require  => User[$nav_user_group]
   }
 
   # Create nav user and group
@@ -79,6 +83,14 @@ class nav::config(
     uid => $nav_user_uid,
     managehome => false,
     gid => $nav_user_group,
+    home => $install_dir,
+    require => Class['nav::install']
+  }
+
+  user { $navcron_user_name:
+    uid => $navcron_user_uid,
+    managehome => false,
+    gid => [ $nav_user_group, 'dialout' ],
     home => $install_dir,
     require => Class['nav::install']
   }
@@ -113,7 +125,7 @@ class nav::config(
       user => 'postgres',
       provider => 'shell',
       command => "source /opt/rh/python27/enable && source ${install_dir}/bin/activate && navsyncdb -c",
-      unless => 'psql -l | grep nav', 
+      unless => 'psql -l | grep nav',
       require => Class['postgresql::server::service']
     }
   }
@@ -125,9 +137,39 @@ class nav::config(
       provider => 'shell',
       environment => 'PYTHONPATH=/opt/graphite/lib/python2.6/site-packages',
       command => "python ${graphite_dir}/webapp/graphite/manage.py syncdb --noinput",
-      unless => 'test -e /opt/graphite/storage/graphite.db', 
+      unless => 'test -e /opt/graphite/storage/graphite.db',
       require => Class['nav']
     }
+  }
+
+  # Add $install_dir to python's sys.path
+  file { "${python_path}/sitecustomize.py":
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template("${module_name}/python/sitecustomize.py.erb"),
+    require => Class['nav::install']
+  }
+
+  # Add init our own init scripts
+  file { '/etc/init.d/ipdevpoll':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template("${module_name}/etc/init.d/ipdevpoll.erb"),
+    require => Class['nav::install']
+  }
+
+  # Add init our own init scripts
+  file { '/etc/init.d/snmptrapd':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template("${module_name}/etc/init.d/snmptrapd.erb"),
+    require => Class['nav::install']
   }
 
   # Use debug in django
