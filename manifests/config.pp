@@ -70,10 +70,9 @@ class nav::config(
   }
 
   exec { 'chgrp_installdir_var':
-    command  => "chgrp -R ${nav_user_group} ${install_dir}/var && chmod -R 0775 ${install_dir}/var",
-    path     => '/bin',
+    command  => "chgrp -R ${nav_user_group} ${install_dir}/var && find ${install_dir}/var -type d | /usr/bin/xargs chmod -R 775",
+    path     => '/bin:/usr/bin',
     provider => 'shell',
-    before   => Class[nav::service],
     unless   => "test $(stat -c %G ${install_dir}/var) = ${nav_user_group}",
     require  => User[$nav_user_group]
   }
