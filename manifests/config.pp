@@ -45,22 +45,50 @@ class nav::config(
     require => Class['nav::install']
   }
 
-  # Graphite wsgi conf
-  exec { 'create graphite.wsgi':
-    creates => "${graphite_dir}/conf/graphite.wsgi",
-    path => '/bin',
+  exec { 'chown_graphite_storage':
+    command  => "chown -R ${graphite_user_name}:${graphite_user_group} ${graphite_dir}/storage && find ${graphite_dir}/storage -type d | /usr/bin/xargs chmod -R 775",
+    path     => '/bin:/usr/bin',
     provider => 'shell',
-    command => "cd ${graphite_dir}/conf && cp graphite.wsgi.example graphite.wsgi",
+    unless   => "test $(stat -c %U ${graphite_dir}/storage) = ${graphite_user_group}",
+    require  => User[$graphite_user_name]
+  }
+
+  # Add carbon config files
+  file { "${graphite_dir}/conf/carbon.conf":
+    ensure => file,
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+    content => template("${module_name}/graphite/carbon.conf.erb"),
     require => Class['nav::install']
   }
 
-  file { "${graphite_dir}/storage":
-    ensure => directory,
-    recurse => false,
-    owner => 'graphite',
-    group => 'graphite',
-    require => User[$graphite_user_name]
+  file { "${graphite_dir}/conf/storage-aggregation.conf":
+    ensure => file,
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+    content => template("${module_name}/graphite/storage-aggregation.conf.erb"),
+    require => Class['nav::install']
   }
+
+  file { "${graphite_dir}/conf/storage-schemas.conf":
+    ensure => file,
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+    content => template("${module_name}/graphite/storage-schemas.conf.erb"),
+    require => Class['nav::install']
+  }
+
+  # Graphite wsgi conf
+  # exec { 'create graphite.wsgi':
+  #   creates => "${graphite_dir}/conf/graphite.wsgi",
+  #   path => '/bin',
+  #   provider => 'shell',
+  #   command => "cd ${graphite_dir}/conf && cp graphite.wsgi.example graphite.wsgi",
+  #   require => Class['nav::install']
+  # }
 
   file { $install_dir:
     ensure => directory,
@@ -162,12 +190,12 @@ class nav::config(
   }
 
   # Add init our own init scripts
-  file { '/etc/init.d/snmptrapd':
+  file { '/etc/init.d/carbon_cache':
     ensure  => present,
     owner   => 'root',
     group   => 'root',
     mode    => '0755',
-    content => template("${module_name}/etc/init.d/snmptrapd.erb"),
+    content => template("${module_name}/etc/init.d/carbon_cache.erb"),
     require => Class['nav::install']
   }
 

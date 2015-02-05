@@ -44,16 +44,16 @@ class nav(
   $db_password         = undef,
   $debug               = false,
   $web_service         = 'httpd',
-  $cronjobs            = {
-    activeip          => {},
-    logengine_regular => {},
-    logengine_del     => {},
-    mactrace          => {},
-    maintengine       => {},
-    netbiostracker    => {},
-    psuwatch          => {},
-    thresholdmon      => {},
-    topology          => {}
+  $cronjobs = {
+    activeip => { ensure => false, minute => '*/30', command => 'collect_active_ip.py'},
+    logengine_regular => { ensure => false, command => 'logengine.py -q' },
+    logengine_del => { ensure => false, minute => 3, hour => 3, command => 'logengine.py -d' },
+    mactrace => { ensure => false, minute => [11,26,41,56], command => 'macwatch.py'},
+    maintengine => { ensure => false, minute => '*/5', command => 'maintengine.py' },
+    netbiostracker => { ensure => false, minute => '*/15', command => 'netbiostracker.py' },
+    psuwatch => { ensure => false, minute => 5, command => 'powersupplywatch.py'},
+    thresholdmon => { ensure => false, minute => '*/5' },
+    topology => { ensure => false, minute => 35, command => 'navtopology --l2 --vlan' }
   }
 ) {
 

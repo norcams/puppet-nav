@@ -1,35 +1,39 @@
 define nav::cronjob(
-  $ensure = true,
-  /* $minute = undef, */
-  /* $hour = undef, */
-  /* $command = false, */
-  /* $path = false, */
+  $ensure,
+  $minute = undef,
+  $hour = undef,
+  $command = false,
+  $path = false,
   $install_dir = $nav::install_dir,
-  /* $navcron_user_name = $nav::navcron_user_name */
+  $nav_user_name = $nav::nav_user_name,
+  $use_scl = $nav::use_scl
 ) {
 
-  file { "/etc/cron.d/${name}":
-    ensure => $ensure? { true => link, default => absent },
-    target => "${install_dir}/etc/cron.d/${name}",
+  if $command == false {
+    $real_command = $name
+  } else {
+    $real_command = $command
   }
 
-  /* if $command == false { */
-  /*   $real_command = $name */
-  /* } else { */
-  /*   $real_command = $command */
-  /* } */
+  if $path == false {
+    $real_path = "${install_dir}/bin"
+  } else {
+    $real_path = $path
+  }
 
-  /* if $path == false { */
-  /*   $real_path = "${install_dir}/bin" */
-  /* } else { */
-  /*   $real_path = $path */
-  /* } */
-
-  /* cron { "nav_${name}": */
-  /*   ensure => $ensure? { true => present, present => present, default => absent }, */
-  /*   user => $navcron_user_name, */
-  /*   minute => $minute, */
-  /*   hour => $hour, */
-  /*   command => "source /opt/rh/python27/enable && source ${install_dir}/bin/activate && ${real_path}/${real_command}", */
-  /* } */
+  cron { "nav_${name}":
+    ensure  => $ensure? {
+      true  => present,
+      present => present,
+      default => absent
+    },
+    user    => 'root',
+    minute  => $minute,
+    hour    => $hour,
+    command => $use_scl? {
+      true => "source /opt/rh/python27/enable && ${real_path}/${real_command}",
+      false => "${real_path}/${real_command}"
+    },
+    require => Class['nav::install']
+  }
 }

@@ -2,7 +2,7 @@ class nav::ldap(
   $install_dir = $nav::install_dir,
   $web_service = $nav::web_service,
   $debug       = $nav::debug,
-  $settings = { enable => false }
+  $settings    = hiera_hash('nav::ldap_settings', { enable => false })
 ){
 
   # {   **enable => false,
