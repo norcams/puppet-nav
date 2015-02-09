@@ -19,6 +19,7 @@
 
 exec="<%= @graphite_dir %>/bin/carbon-cache.py"
 prog=$(basename "$exec")
+user=<%= @graphite_user_name %>
 CARBON_CONFIG_PATH="<%= @graphite_dir %>/conf/carbon.conf"
 CARBON_CACHE_ARGS=""
 CARBON_CACHE_PIDFILE="<%= @graphite_dir %>/carbon-cache.pid"
@@ -41,7 +42,7 @@ rh_status() {
 
 start() {
     echo -n 'Starting carbon-cache...'
-    daemon --pidfile="$CARBON_CACHE_PIDFILE" "$exec" start $args \
+    daemon --user="$user" "$exec" start $args \
       --config="$CARBON_CONFIG_PATH" --pidfile="$CARBON_CACHE_PIDFILE" >/dev/null
     retval=$?
     echo

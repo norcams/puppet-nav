@@ -196,6 +196,7 @@ class nav::config(
     group   => 'root',
     mode    => '0755',
     content => template("${module_name}/etc/init.d/carbon_cache.erb"),
+    notify  => Service['carbon_cache'],
     require => Class['nav::install']
   }
 
