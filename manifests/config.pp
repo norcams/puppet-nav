@@ -180,12 +180,22 @@ class nav::config(
   # }
 
   # Add init our own init scripts
-  file { '/etc/init.d/ipdevpoll':
+  file { '/etc/systemd/system/ipdevpoll.service':
     ensure  => present,
     owner   => 'root',
     group   => 'root',
-    mode    => '0755',
-    content => template("${module_name}/etc/init.d/ipdevpoll.erb"),
+    mode    => '0644',
+    content => template("${module_name}/etc/systemd/ipdevpoll.service.erb"),
+    require => Class['nav::install']
+  }
+
+  # Store PYTHONPATH in an environment file for systemd service
+  file { '/etc/sysconfig/nav' :
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template("${module_name}/etc/sysconfig/nav.erb"),
     require => Class['nav::install']
   }
 

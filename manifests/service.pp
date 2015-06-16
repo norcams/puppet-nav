@@ -7,8 +7,10 @@ class nav::service() {
   # }
 
   service { 'ipdevpoll':
-    ensure  => running,
-    require => Class['nav::config']
+    enable   => true,
+    ensure   => running,
+    provider => systemd,
+    require  => Class['nav::config']
   }
 
 }

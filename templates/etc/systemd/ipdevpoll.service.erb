@@ -1,0 +1,14 @@
+[Unit]
+Description=Starts the NAV ipdevpoll daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/nav
+User=<%= @navcron_user_name %>
+WorkingDirectory=<%= @install_dir %>
+ExecStart=<%= @install_dir -%>/bin/ipdevpolld -f
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
