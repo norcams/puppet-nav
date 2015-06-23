@@ -6,7 +6,6 @@ define nav::cronjob(
   $path = false,
   $install_dir = $nav::install_dir,
   $nav_user_name = $nav::nav_user_name,
-  # $use_scl = $nav::use_scl
 ) {
 
   if $command == false {
@@ -31,10 +30,6 @@ define nav::cronjob(
     minute  => $minute,
     hour    => $hour,
     command => "${real_path}/${real_command}",
-    # command => $use_scl? {
-    #   true => "source /opt/rh/python27/enable && ${real_path}/${real_command}",
-    #   false => "${real_path}/${real_command}"
-    # },
     require => Class['nav::install']
   }
 }
