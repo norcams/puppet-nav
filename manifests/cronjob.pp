@@ -20,7 +20,7 @@ define nav::cronjob(
     $real_path = $path
   }
 
-  $python_path = "PYTHONPATH=\"${install_dir}/lib/python2.7:${install_dir}/lib/python2.7/site-packages\""
+  $python_path = "PYTHONPATH=\"${install_dir}/lib/python2.7:${install_dir}/lib/python2.7/site-packages\" 2>&1"
 
   cron { "nav_${name}":
     ensure  => $ensure? {
