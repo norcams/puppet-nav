@@ -20,7 +20,7 @@ define nav::cronjob(
     $real_path = $path
   }
 
-  $python_path = "PYTHONPATH=\"${install_dir}/lib/python2.7:${install_dir}/lib/python2.7/site-packages\" 2>&1"
+  $python_path = "PYTHONPATH=\"${install_dir}/lib/python2.7:${install_dir}/lib/python2.7/site-packages\""
 
   cron { "nav_${name}":
     ensure  => $ensure? {
@@ -31,7 +31,7 @@ define nav::cronjob(
     user    => $nav_user_name,
     minute  => $minute,
     hour    => $hour,
-    command => "${python_path} ${real_path}/${real_command}",
+    command => "${python_path} ${real_path}/${real_command} 2>&1",
     require => Class['nav::install']
   }
 }
