@@ -1,9 +1,9 @@
 # puppet-nav
 
-Sets up the [NAV (Network Administration
+Manages the [NAV (Network Administration
 Visualized)](https://metanav.uninett.no/) application, backend and frontend.
 
-You need to manage dependencies seperately, e.g. HTTP server, Graphite and
+You need to manage dependencies separately, e.g. HTTP server, Graphite and
 database.
 
 More documentation and usage examples coming soon.
