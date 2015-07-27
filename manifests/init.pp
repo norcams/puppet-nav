@@ -1,6 +1,6 @@
 # == Class: nav
 #
-# Sets up NAV with Graphite
+# Sets up NAV
 #
 # === Parameters
 #
