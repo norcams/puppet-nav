@@ -7,3 +7,5 @@ You need to manage dependencies separately, e.g. HTTP server, Graphite and
 database.
 
 More documentation and usage examples coming soon.
+
+If you would like to contribute, fork and send a pull request.
